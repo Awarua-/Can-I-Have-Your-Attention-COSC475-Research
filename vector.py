@@ -22,27 +22,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-import math
+from mpmath import mp, sqrt, sin, cos, acos, degrees, radians
+
+
+mp.dps = 100
 
 
 class Vector(object):
     def __init__(self, *args):
         """ Create a vector, example: v = Vector(1,2) """
         if len(args) == 0:
-            self.values = (0, 0)
+            self.values = (mp.mpf('0'), mp.mpf('0'))
         else:
-            self.values = args
+            self.values = tuple(map(mp.mpf, args))
 
     def norm(self):
         """ Returns the norm (length, magnitude) of the vector """
-        return math.sqrt(sum(comp**2 for comp in self))
+        return sqrt(sum(comp**2 for comp in self))
 
     def argument(self):
         """ Returns the argument of the vector, the angle clockwise from +y."""
-        arg_in_rad = math.acos(Vector(0, 1)*self/self.norm())
-        arg_in_deg = math.degrees(arg_in_rad)
-        if self.values[0] < 0:
-            return 360 - arg_in_deg
+        arg_in_rad = acos(Vector(mp.mpf('0'), mp.mpf('1'))*self/self.norm())
+        arg_in_deg = degrees(arg_in_rad)
+        if self.values[0] < mp.mpf('0'):
+            return mp.mpf('360') - arg_in_deg
         else:
             return arg_in_deg
 
@@ -57,7 +60,7 @@ class Vector(object):
             2D vector and rotates by the passed value in degrees.  Otherwise,
             assumes the passed value is a list acting as a matrix which rotates the vector.
         """
-        if len(args) == 1 and type(args[0]) == type(1) or type(args[0]) == type(1.):
+        if len(args) == 1 and isinstance(args[0], mp.mpf):
             # So, if rotate is passed an int or a float...
             if len(self) != 2:
                 raise ValueError("Rotation axis not defined for greater than 2D vector")
@@ -73,9 +76,9 @@ class Vector(object):
 
             Returns a new vector.
         """
-        theta = math.radians(theta)
+        theta = radians(theta)
         # Just applying the 2D rotation matrix
-        dc, ds = math.cos(theta), math.sin(theta)
+        dc, ds = cos(theta), sin(theta)
         x, y = self.values
         x, y = dc*x - ds*y, ds*x + dc*y
         return Vector(x, y)
@@ -109,7 +112,7 @@ class Vector(object):
         """
         if type(other) == type(self):
             return self.inner(other)
-        elif type(other) == type(1) or type(other) == type(1.0):
+        elif isinstance(other, mp.mpf):
             product = tuple(a * other for a in self)
             return Vector(*product)
 
@@ -118,7 +121,7 @@ class Vector(object):
         return self.__mul__(other)
 
     def __div__(self, other):
-        if type(other) == type(1) or type(other) == type(1.0):
+        if isinstance(other, mp.mpf):
             divided = tuple(a / other for a in self)
             return Vector(*divided)
 

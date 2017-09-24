@@ -1,7 +1,10 @@
 
-from classes import Point
+from classes import Point, LengthAnglePair
 from vector import Vector
-from math import acos
+from mpmath import mp, atan2, degrees
+
+
+mp.dps = 100
 
 
 def _load_file(file_name):
@@ -12,7 +15,7 @@ def _load_file(file_name):
     raw_points = line.split(',')
     for raw_point in raw_points:
         raw_data = raw_point.split(' ')
-        point = Point(float(raw_data[0]), float(raw_data[1]))
+        point = Point(raw_data[0], raw_data[1])
         points.append(point)
     return points
 
@@ -33,13 +36,15 @@ def _build_sequence(vectors):
     i = 0
     while i < len(vectors) - 1:
         length = vectors[i].norm()
-        sequence.append(length)
-        v1n = vectors[i].normalize()
-        v2n = vectors[i + 1].normalize()
-        angle = acos(v1n * v2n)
-        sequence.append(angle)
+        v1n = vectors[i]
+        v2n = vectors[i + 1]
+        cross_prod = Vector(v1n[0] * v2n[1] - v1n[1] * v2n[0],
+                            v1n[0] * v2n[0] + v1n[1] * v2n[1])
+        angle = degrees(atan2(cross_prod[0], cross_prod[1]))
+        sequence.append(LengthAnglePair(length, angle))
         i += 1
     length = vectors[i].norm()
+    sequence.append(LengthAnglePair(length, None))
 
     return sequence
 
