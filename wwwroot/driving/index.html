@@ -11,27 +11,86 @@
   integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
   crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.11.5/paper-full.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/2.4.3/seedrandom.min.js"></script>
+  <script>
+      Window.globals = {
+          nextTarget: null,
+          showingImage: false
+      };
+  </script>
   <script type="text/paperscript" canvas="myCanvas">
 
     var spline = null;
+    var globals = Window.globals;
+
+    Math.seedrandom('bar');
+    var curveRadius = 300;
+    var step = 600;
 
     var generate_spline = function(cb) {
-        var max = -100000;
+        var max = -150000;
         var starting = 400;
-        var step = 600;
 
         var current = starting;
 
         var segments = [[lineContainerWidth / 2, current]];
-
+        var reverse = true;
         while (current > max) {
             current -= step;
-            segments.push([Math.round(Math.max(0.2, Math.min(0.8, Math.random())) * lineContainerWidth), current]);
+            // remember to offset step by curve diameter.
+            var point = generatePoint(current, segments[segments.length - 1]);
+            segments.push(point);
+            current -= curveRadius;
+
+            if (reverse) {
+                segments = segments.concat(generateCurve(point, reverse));
+                reverse = false;
+            }
+            else {
+                segments = segments.concat(generateCurve(point, reverse));
+                reverse = true;
+            }
         }
 
         cb(segments);
     };
-    var topPoint = new Point(lineContainerWidth / 2, 390);
+
+    var generatePoint = function(currentY, lastPoint) {
+        var isValid = false;
+        while (!isValid) {
+            // limit range of values, min 0.3 and max 0.7, so that we don't go off the screen
+            // ensure that there is a minimum change in distance of 0.25, in the x direction
+            var randomValue = Math.random();
+            if (randomValue < 0.3) {
+                continue;
+            }
+            if (randomValue > 0.7) {
+                continue;
+            }
+            var lastXModifier = lastPoint[0] / lineContainerWidth;
+            var diff = Math.abs(Math.abs(lastXModifier) - Math.abs(randomValue));
+            if (diff > 0.15) {
+                isValid = true;
+                return [randomValue * lineContainerWidth, currentY];
+            }
+        }
+    }
+
+
+    var generateCurve = function(startPoint, reverse) {
+        var sequence = [];
+        if (reverse) {
+            sequence.push([startPoint[0] + curveRadius, startPoint[1] - curveRadius]);
+        }
+        else {
+            sequence.push([startPoint[0] - curveRadius, startPoint[1] - curveRadius]);
+        }
+        sequence.push([startPoint[0], startPoint[1] - 2 * curveRadius]);
+        return sequence;
+    };
+
+    var circleY = 390;
+    var topPoint = new Point(lineContainerWidth / 2, circleY);
     var circle = new Path.Circle(
         {
             center: topPoint,
@@ -54,8 +113,9 @@
 
 
     var destination = new Point(lineContainerWidth / 2, -100000)
+    var imageShowThreshold = step - 100;
     function onFrame(event) {
-        var measurePoint = new Point(arrowPos, 430);
+        var measurePoint = new Point(arrowPos, circleY);
 
     	var vector = destination - spline.position;
 
@@ -67,6 +127,14 @@
         if (socket.readyState === 1) {
             socket.send(JSON.stringify({type: 'log', data: {dist: distance, timestamp: Date.now()}}));
         }
+
+        var nearestPoint = spline.getNearestPoint(measurePoint);
+        var yDistance = nearestPoint.x;
+        if (yDistance > imageShowThreshold && globals.nextTarget && !globals.showingImage) {
+            globals.showingImage = true;
+            showImage(globals.nextTarget);
+        }
+
     }
 
   </script>
@@ -185,6 +253,8 @@
         let arrowPos = halfway;
         let imageMap = null;
 
+        let nextTarget = null;
+
         $('#arrow').css('left', halfway + 'px');
 
         socket.addEventListener('open', function (event) {
@@ -220,9 +290,12 @@
             }
             else if (data.target === null) {
                 clearImage();
+                Window.globals.nextTarget = null;
+                Window.globals.showingImage = false;
             }
             else if (data.target) {
-                showImage(data.target);
+                // showImage(data.target);
+                Window.globals.nextTarget = data.target;
             }
             else {
                 console.error("didn't expect to get here");

@@ -126,11 +126,11 @@ app.use((err, req, res, next) => {
 let startChrome = () => {
     drivingChrome = chromeLauncher.launch({
         startingUrl: "http://localhost:3000/driving/index.html",
-        chromeFlags: ['--start-fullscreen', '--incognito', '--disable-pinch', '--overscroll-history-navigation=0']
+        chromeFlags: ['--incognito', '--disable-pinch', '--overscroll-history-navigation=0']
     });
     touchChrome = chromeLauncher.launch({
         startingUrl: "http://localhost:3000/touchscreen/index.html",
-        chromeFlags: ['--start-fullscreen', '--incognito', '--disable-pinch', '--overscroll-history-navigation=0']
+        chromeFlags: ['--incognito', '--disable-pinch', '--overscroll-history-navigation=0']
     });
 };
 

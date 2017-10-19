@@ -1,5 +1,7 @@
 'use-strict';
 
+const seedrandom = require('seedrandom'),
+    PRNG = seedrandom('foo');
 
 class Touch {
     constructor(cb, imageMap) {
@@ -54,7 +56,7 @@ class Touch {
 
     getRandomInt(min, max) {
         //TODO seed random
-        return Math.floor(Math.random() * (max - min + 1)) + min;
+        return Math.floor(PRNG() * (max - min + 1)) + min;
     }
 
     shuffle() {
@@ -63,7 +65,7 @@ class Touch {
         , temp = null
 
       for (i = this.targetSequence.length - 1; i > 0; i -= 1) {
-        j = Math.floor(Math.random() * (i + 1))
+        j = Math.floor(PRNG() * (i + 1))
         temp = this.targetSequence[i]
         this.targetSequence[i] = this.targetSequence[j]
         this.targetSequence[j] = temp
