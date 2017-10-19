@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>Driving Task</title>
+    <meta name="description" content="Driving Task display">
+    <script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.11.5/paper-full.js"></script>
+  <script type="text/paperscript" canvas="myCanvas">
+
+    var spline = null;
+
+    var generate_spline = function(cb) {
+        var max = -100000;
+        var starting = 400;
+        var step = 600;
+
+        var current = starting;
+
+        var segments = [[lineContainerWidth / 2, current]];
+
+        while (current > max) {
+            current -= step;
+            segments.push([Math.round(Math.max(0.2, Math.min(0.8, Math.random())) * lineContainerWidth), current]);
+        }
+
+        cb(segments);
+    };
+    var topPoint = new Point(lineContainerWidth / 2, 390);
+    var circle = new Path.Circle(
+        {
+            center: topPoint,
+            radius: 30,
+            fillColor: 'red'
+        }
+    );
+
+    generate_spline(function(sequence) {
+
+        spline = new Path({
+            segments: sequence,
+            strokeColor: 'black',
+            strokeWidth: 3
+        });
+
+        spline.smooth();
+    });
+
+
+
+    var destination = new Point(lineContainerWidth / 2, -100000)
+    function onFrame(event) {
+        var measurePoint = new Point(arrowPos, 430);
+
+    	var vector = destination - spline.position;
+
+        circle.position = measurePoint;
+
+    	spline.position -= vector / 25000;
+
+        distance = spline.getNearestLocation(measurePoint).distance;
+        if (socket.readyState === 1) {
+            socket.send(JSON.stringify({type: 'log', data: {dist: distance, timestamp: Date.now()}}));
+        }
+    }
+
+  </script>
+
+<script type="text/paperscript" canvas="arrowCanvas">
+  var arrow = new Path(
+      {
+          segments: [[0, 60], [20, 60], [20, 200], [40, 200], [40, 60], [60, 60], [30, 0]],
+          closed: true,
+          fillColor: 'blue'
+      }
+  );
+  function onFrame(event) {
+      var measurePoint = new Point(arrowPos, 100);
+
+      arrow.position = measurePoint;
+  }
+
+</script>
+
+    <style>
+      body, html {
+        margin: 0;
+        font-family: 'Roboto', 'Noto', sans-serif;
+        line-height: 1.5;
+        height: 100%;
+        min-height: 100vh;
+        background-color: #eeeeee;
+        overflow: hidden;
+      }
+      #info {
+          height: 20%;
+          background-color: grey;
+      }
+      #direction {
+          background-color: green;
+          height: 40%
+      }
+
+      #myCanvas, #arrowCanvas {
+          height: 100%;
+          width: 100%;
+      }
+
+      #arrowContainer {
+          position: absolute;
+          bottom: 0;
+          height: 40%;
+          width: 100%;
+          background-color: yellow;
+      }
+      #message {
+          height: 100%;
+          width: 100%;
+          text-align: center;
+          background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+      /*#line {
+          position: absolute;
+          width: 1rem;
+          height: 25%;
+          top: 35%;
+          background-color: black;
+          transition: left;
+          transition-duration: 0.5s;
+          transition-timing-function: linear;
+
+      }
+
+      #arrow {
+          position: absolute;
+          transition: left;
+          transition-duration: 0.1s;
+          transition-timing-function: linear;
+          margin-left: -2.0rem;
+      }
+
+      .line {
+          width: 1rem;
+          background-color: blue;
+          height: 20rem;
+          margin-left: 1.5rem;
+
+      }
+      .point {
+          width: 0;
+          height: 0;
+          border-left: 2rem solid transparent;
+          border-right: 2rem solid transparent;
+          border-bottom: 4rem solid blue;
+      }*/
+  </style>
+  </head>
+  <body>
+    <div id="info">
+        <div id="message"></div>
+    </div>
+    <div id="direction">
+        <canvas id="myCanvas"></canvas>
+    </div>
+
+    <div id="arrowContainer">
+        <canvas id="arrowCanvas"></canvas>
+    </div>
+
+    <script>
+        const socket = new WebSocket("ws://localhost:3011");
+
+        let width = $('#arrowContainer').prop('offsetWidth');
+        let lineContainerWidth = $('#direction').prop('offsetWidth');
+
+        let halfway = width / 2;
+
+        let arrowPos = halfway;
+        let imageMap = null;
+
+        $('#arrow').css('left', halfway + 'px');
+
+        socket.addEventListener('open', function (event) {
+            socket.send(JSON.stringify({type: 'hello', data: 'Hello Server!'}));
+        });
+
+        $(document).ready(() => {
+            $.get(window.location.protocol + "//" + window.location.host + "/imageMap", (data) => {
+                imageMap = data;
+            });
+        });
+
+        socket.addEventListener('message', (event) => {
+            let message = JSON.parse(event.data)
+            switch (message.type) {
+                case 'steering':
+                    updateArrowPosition(message.data);
+                    break;
+                case 'display':
+                    showData(message.data);
+                    break;
+                default:
+                    console.error("Message was not of a supported type");
+            }
+        });
+
+        let showData = data => {
+            if (data === null) {
+                clearMessage();
+            }
+            else if (data.message) {
+                showMessage(data.message);
+            }
+            else if (data.target === null) {
+                clearImage();
+            }
+            else if (data.target) {
+                showImage(data.target);
+            }
+            else {
+                console.error("didn't expect to get here");
+            }
+        };
+
+        let clearMessage = () => {
+            $('#message').empty();
+        }
+
+        let showMessage = message => {
+            $('#message').text(message);
+        }
+
+        let clearImage = () => {
+            $('#message').css('background-image', '');
+        }
+
+        let showImage = target => {
+            clearMessage();
+            let imageUrl = imageMap[target];
+            if (imageUrl) {
+                $('#message').css('background-image', 'url(../'+ imageUrl + ')');
+            }
+            else {
+                console.error('something went wrong');
+            }
+        }
+
+        let updateArrowPosition = data => {
+            let arrow = $('#arrow');
+            arrowPos = (width * data);
+            arrow.css('left', arrowPos + 'px');
+
+        }
+    </script>
+    <noscript>
+      Please enable JavaScript to view this website.
+    </noscript>
+  </body>
+</html>

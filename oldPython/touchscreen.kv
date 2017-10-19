@@ -1,0 +1,26 @@
+#:kivy 1.0
+#:import CircularButton circularButton.CircularButton
+
+<CircularButton>:
+    # force circle
+    size: (min(self.width, self.height), min(self.width, self.height))
+    canvas:
+        Color:
+            rgba: ((1, 1, 1, 1) if self.state == "normal" else (.5, .5, .5, 1))
+        Ellipse:
+            pos: self.pos
+            size: self.size
+
+<LargeC@CircularButton>:
+    size: (5, 5)
+
+<MediumC@CircularButton>:
+    size: (3, 3)
+
+<SmallC@CircularButton>:
+    size: (1, 1)
+
+FloatLayout:
+    LargeC:
+        id: "1"
+        pos: (20, 20)

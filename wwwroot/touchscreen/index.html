@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <title>Touch Screen</title>
+    <meta name="description" content="Touch display">
+    <script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+
+    <!-- See https://goo.gl/OOhYW5 -->
+    <!-- <link rel="manifest" href="/manifest.json">
+    <script src="../bower_components/webcomponentsjs/webcomponents-loader.js"></script>-->
+
+
+    <style>
+      body, html {
+        margin: 0;
+        font-family: 'Roboto', 'Noto', sans-serif;
+        line-height: 1.5;
+        height: 100%;
+        min-height: 100vh;
+        background-color: black;
+      }
+
+      #empty {
+          min-height: 100vh;
+      }
+
+      .round {
+          background-size: 2.4rem 2.4rem;
+          background-position: center;
+          background-repeat: no-repeat;
+          border: 0;
+          background-color: white;
+          color: white;
+          box-shadow:none;
+          border-radius: 5rem;
+          position: absolute;
+      }
+
+      button:focus {
+          outline: 0;
+      }
+
+      .medium_flat {
+          width: 6.2rem;
+          height: 6.2rem;
+          margin-left: -3.1rem;
+          margin-top: -3.1rem;
+      }
+
+      .large_flat {
+          width: 10rem;
+          height: 10rem;
+          margin-left: -5rem;
+          margin-top: -5rem;
+      }
+
+      .medium_curve {
+          width: 5.5rem;
+          height: 5.5rem;
+          margin-left: -2.75rem;
+          margin-top: -2.75rem;
+      }
+
+      .large_curve {
+          width: 9rem;
+          height: 9rem;
+          margin-left: -4.5rem;
+          margin-top: -4.5rem;
+      }
+
+      .small_curve {
+          width: 2.4rem;
+          height: 2.4rem;
+          margin-left: -1.2rem;
+          margin-top: -1.2rem;
+      }
+
+      .small_flat {
+          width: 2.9rem;
+          height: 2.9rem;
+          margin-left: -1.45rem;
+          margin-top: -1.45rem;
+      }
+
+      .column1 {
+          left: 16.2rem;
+      }
+
+      .row1 {
+          top: 8.7rem;
+      }
+
+      .row2 {
+          top: 21.3rem;
+      }
+
+      .row3{
+          top: 33.9rem;
+      }
+
+      .row4 {
+          top: 46.4rem;
+      }
+
+      .row5 {
+          top: 61.2rem;
+      }
+
+      .column2 {
+          left: 31.3rem;
+      }
+
+      .column3 {
+          left: 46.3rem;
+      }
+
+      .column4 {
+          left: 73.9rem;
+      }
+
+      .column5 {
+          left: 89rem;
+      }
+
+      .column6 {
+          left: 104rem;
+      }
+
+  </style>
+  </head>
+  <body oncontextmenu="return false;">
+      <div id="container">
+
+
+      <button class="round large_curve column1 row1" id="l_c_1_1">
+      </button>
+      <button class="round medium_flat column1 row2" id="m_f_2_1">
+      </button>
+      <!-- <button class="round small_curve column1 row3" id="s_c_3_1">
+      </button> -->
+      <!-- <button class="round large_flat column1 row4" id="l_f_4_1">
+      </button>
+      <button class="round medium_curve column1 row5" id="m_c_5_1">
+      </button> -->
+
+      <button class="round small_curve column2 row1" id="s_c_1_2">
+      </button>
+      <button class="round large_flat column2 row2" id="l_f_2_2">
+      </button>
+      <!-- <button class="round medium_curve column2 row3" id="m_c_3_2">
+      </button> -->
+      <!-- <button class="round medium_flat column2 row4" id="m_f_4_2">
+      </button>
+      <button class="round small_curve column2 row5" id="s_c_5_2">
+      </button> -->
+
+        <button class="round medium_curve column3 row1" id="m_c_1_3">
+        </button>
+        <button class="round small_flat column3 row2" id="s_f_2_3">
+        </button>
+        <!-- <button class="round large_curve column3 row3" id="l_c_3_3">
+        </button> -->
+        <!-- <button class="round small_flat column3 row4" id="s_f_4_3">
+        </button>
+        <button class="round large_curve column3 row5" id="l_c_5_3">
+        </button> -->
+
+        <button class="round small_flat column4 row1" id="s_f_1_4">
+        </button>
+        <button class="round large_curve column4 row2" id="l_c_2_4">
+        </button>
+        <!-- <button class="round medium_flat column4 row3" id="m_f_3_4">
+        </button> -->
+        <!-- <button class="round small_curve column4 row4" id="s_c_4_4">
+        </button>
+        <button class="round medium_flat column4 row5" id="m_f_5_4">
+        </button> -->
+
+        <button class="round large_flat column5 row1" id="l_f_1_5">
+        </button>
+        <button class="round medium_curve column5 row2" id="m_c_2_5">
+        </button>
+        <!-- <button class="round large_flat column5 row3" id="l_f_3_5">
+        </button> -->
+        <!-- <button class="round medium_curve column5 row4" id="m_c_4_5">
+        </button>
+        <button class="round large_flat column5 row5" id="l_f_5_5">
+        </button> -->
+
+        <button class="round medium_flat column6 row1" id="m_f_1_6">
+        </button>
+        <button class="round small_curve column6 row2" id="s_c_2_6">
+        </button>
+        <!-- <button class="round small_flat column6 row3" id="s_f_3_6">
+        </button> -->
+        <!-- <button class="round large_curve column6 row4" id="l_c_4_6">
+        </button>
+        <button class="round small_flat column6 row5" id="s_f_5_6">
+        </button> -->
+ </div>
+ <div id="empty">
+
+ </div>
+    <noscript>
+      Please enable JavaScript to view this website.
+    </noscript>
+
+    <script>
+        const socket = new WebSocket("ws://localhost:3011");
+
+        let lastTarget = null;
+
+        socket.addEventListener('open', function (event) {
+            socket.send(JSON.stringify({type: 'hello', data: 'Hello Server!'}));
+        });
+        socket.addEventListener('message', (event) => {
+            let message = JSON.parse(event.data)
+            switch (message.type) {
+                case 'display':
+                    updateTarget(message.data);
+                    break;
+                default:
+                    console.error("Message was not of a supported type");
+            }
+        });
+
+        let updateTarget = (data) => {
+            if (data.target) {
+                lastTarget = data.target;
+            }
+        }
+
+        $(document).ready(() => {
+
+            $.get(window.location.protocol + "//" + window.location.host + "/imageMap", (data) => {
+                for (let key in data) {
+                    let ref = "../" + data[key];
+                    $("#" + key).css('background-image', 'url('+ ref + ')');
+                }
+            });
+
+            $('body').bind('touchstart', (event) => {
+                event.preventDefault();
+                socket.send(JSON.stringify({type: 'sound', data: {soundType: "click"}}));
+            });
+
+            $('button').bind('touchend', (event) => {
+                event.preventDefault();
+
+                if (event.target.id === lastTarget) {
+                    lastTarget = null;
+                    socket.send(JSON.stringify({type: 'sound', data: {soundType: "hit"}}));
+                    socket.send(JSON.stringify({type: 'log', data: {hit: true, target: event.target.id, timestamp: Date.now()}}));
+                }
+
+                else {
+                    socket.send(JSON.stringify({type: 'sound', data: {soundType: "miss"}}));
+                    socket.send(JSON.stringify({type: 'log', data: {hit: false, timestamp: Date.now()}}));
+                }
+            });
+
+            $('#empty').bind('touchend', (event) => {
+                event.preventDefault();
+                let endTarget = document.elementFromPoint(event.changedTouches[0].pageX, event.changedTouches[0].pageY);
+                let isButton = $(endTarget).is(":button");
+
+                if(isButton && lastTarget === endTarget.id) {
+                    socket.send(JSON.stringify({type: 'sound', data: {soundType: "hit"}}));
+                    socket.send(JSON.stringify({type: 'log', data: {hit: true, target: endTarget.id, timestamp: Date.now()}}));
+                }
+                else {
+                    socket.send(JSON.stringify({type: 'sound', data: {soundType: "miss"}}));
+                    socket.send(JSON.stringify({type: 'log', data: {hit: false, timestamp: Date.now()}}));
+                }
+            });
+        })
+    </script>
+  </body>
+</html>
