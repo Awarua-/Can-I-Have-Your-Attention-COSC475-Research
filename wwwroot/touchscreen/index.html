@@ -10,10 +10,7 @@
   src="https://code.jquery.com/jquery-3.2.1.min.js"
   integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
   crossorigin="anonymous"></script>
-
-    <!-- See https://goo.gl/OOhYW5 -->
-    <!-- <link rel="manifest" href="/manifest.json">
-    <script src="../bower_components/webcomponentsjs/webcomponents-loader.js"></script>-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.5/howler.min.js"></script>
 
 
     <style>
@@ -215,7 +212,23 @@
     <script>
         const socket = new WebSocket("ws://localhost:3011");
 
-        let lastTarget = null;
+        let lastTarget = null,
+            hitSound = new Howl({
+                src: ['../sounds/hit.wav']
+            }),
+            missSound = new Howl({
+                src: ['../sounds/miss.wav']
+            }),
+            clickSound = new Howl({
+                src: ['../sounds/click.wav']
+            });
+
+        clickSound.on('end', (id, error) => {
+            console.log('error');
+        });
+
+        console.log('hello');
+
 
         socket.addEventListener('open', function (event) {
             socket.send(JSON.stringify({type: 'hello', data: 'Hello Server!'}));
@@ -227,7 +240,7 @@
                     updateTarget(message.data);
                     break;
                 default:
-                    console.error("Message was not of a supported type");
+                    console.warn("Message was not of a supported type");
             }
         });
 
@@ -249,6 +262,7 @@
             $('body').bind('touchstart', (event) => {
                 event.preventDefault();
                 socket.send(JSON.stringify({type: 'sound', data: {soundType: "click"}}));
+                clickSound.play();
             });
 
             $('button').bind('touchend', (event) => {
@@ -258,11 +272,13 @@
                     lastTarget = null;
                     socket.send(JSON.stringify({type: 'sound', data: {soundType: "hit"}}));
                     socket.send(JSON.stringify({type: 'log', data: {hit: true, target: event.target.id, timestamp: Date.now()}}));
+                    hitSound.play();
                 }
 
                 else {
                     socket.send(JSON.stringify({type: 'sound', data: {soundType: "miss"}}));
                     socket.send(JSON.stringify({type: 'log', data: {hit: false, timestamp: Date.now()}}));
+                    missSound.play();
                 }
             });
 
@@ -274,10 +290,12 @@
                 if(isButton && lastTarget === endTarget.id) {
                     socket.send(JSON.stringify({type: 'sound', data: {soundType: "hit"}}));
                     socket.send(JSON.stringify({type: 'log', data: {hit: true, target: endTarget.id, timestamp: Date.now()}}));
+                    hitSound.play();
                 }
                 else {
                     socket.send(JSON.stringify({type: 'sound', data: {soundType: "miss"}}));
                     socket.send(JSON.stringify({type: 'log', data: {hit: false, timestamp: Date.now()}}));
+                    missSound.play();
                 }
             });
         })

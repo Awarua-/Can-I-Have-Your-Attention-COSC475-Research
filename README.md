@@ -6,9 +6,14 @@ Node v8 or higher
 Java maybe?
 Chrome installed
 
+yarn
+
 
 Installing
-npm install
+yarn install
+
+cd node_modules/chrome-launcher
+yarn build
 
 
 Running

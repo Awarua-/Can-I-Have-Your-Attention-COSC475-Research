@@ -1,7 +1,7 @@
 'use-strict';
 
 const seedrandom = require('seedrandom'),
-    PRNG = seedrandom('foo');
+    PRNG = seedrandom('beaasdrfjlkjw ajer0u023058092iio bneed to add more entropy!!!!!!!');
 
 class Touch {
     constructor(cb, imageMap) {

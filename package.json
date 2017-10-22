@@ -15,16 +15,14 @@
   "homepage": "https://github.com/Awarua-/Can-I-Have-Your-Attention-COSC475-Research#readme",
   "dependencies": {
     "body-parser": "^1.17.2",
-    "chrome-launcher": "^0.8.1",
+    "chrome-launcher": "Awarua-/chrome-launcher#enableAudio-option",
     "express": "^4.15.3",
     "gkm": "^0.1.0",
     "key-emit": "0.0.4",
     "logitech-g29": "^1.0.5",
     "mathjs": "^3.14.2",
+    "readable-stream": "^2.3.3",
     "seedrandom": "^2.4.3",
-    "speaker": "^0.4.0",
-    "wav": "^1.0.1",
-    "web-audio-api": "^0.2.2",
     "ws": "^2.3.1"
   },
   "engines": {
@@ -33,5 +31,9 @@
   "devDependencies": {
     "eslint": "^3.19.0",
     "eslint-plugin-node": "^4.2.2"
+  },
+  "scripts": {
+      "start": "node main.js"
   }
+
 }

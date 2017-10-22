@@ -26,7 +26,7 @@ let messageHandler = (message) => {
             touch.check(message.data);
             break;
         case 'sound':
-            sound.play(message.data);
+            logger.log(message);
             break;
         case 'hello':
             break;
@@ -52,10 +52,6 @@ const express = require('express'),
     WSSocket = require('./websocket.js'),
     Steering = require('./steering.js'),
     Touch = require('./touch.js'),
-    Sound = require('./sound.js'),
-    sound = new Sound(),
-    // Driving = require('./driving.js'),
-    // driving = new Driving(socket.send.bind(socket)),
     stencilImageMap = require('./stencilImageMap.json'),
     nonStencilImageMap = require('./nonStencilImageMap.json'),
     chromeLauncher = require('chrome-launcher');
@@ -130,7 +126,8 @@ let startChrome = () => {
     });
     touchChrome = chromeLauncher.launch({
         startingUrl: "http://localhost:3000/touchscreen/index.html",
-        chromeFlags: ['--incognito', '--disable-pinch', '--overscroll-history-navigation=0']
+        chromeFlags: ['--incognito', '--disable-pinch', '--overscroll-history-navigation=0'],
+        enableAudio: true
     });
 };
 

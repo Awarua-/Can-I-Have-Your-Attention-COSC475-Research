@@ -15,7 +15,8 @@
   <script>
       Window.globals = {
           nextTarget: null,
-          showingImage: false
+          showingImage: false,
+          arrowRotation: 0
       };
   </script>
   <script type="text/paperscript" canvas="myCanvas">
@@ -23,13 +24,13 @@
     var spline = null;
     var globals = Window.globals;
 
-    Math.seedrandom('bar');
+    Math.seedrandom('bar need to add more entropy!!!!!!!');
     var curveRadius = 300;
     var step = 600;
 
     var generate_spline = function(cb) {
         var max = -150000;
-        var starting = 400;
+        var starting = splineContainerHeight;
 
         var current = starting;
 
@@ -89,7 +90,7 @@
         return sequence;
     };
 
-    var circleY = 390;
+    var circleY = splineContainerHeight;
     var topPoint = new Point(lineContainerWidth / 2, circleY);
     var circle = new Path.Circle(
         {
@@ -113,9 +114,12 @@
 
 
     var destination = new Point(lineContainerWidth / 2, -100000)
-    var imageShowThreshold = step - 100;
+    var imageShowThreshold = 10;
+    var measurePoint = null;
+
     function onFrame(event) {
-        var measurePoint = new Point(arrowPos, circleY);
+        measurePoint = new Point(arrowPos, circleY);
+
 
     	var vector = destination - spline.position;
 
@@ -123,19 +127,37 @@
 
     	spline.position -= vector / 25000;
 
-        distance = spline.getNearestLocation(measurePoint).distance;
-        if (socket.readyState === 1) {
-            socket.send(JSON.stringify({type: 'log', data: {dist: distance, timestamp: Date.now()}}));
-        }
+        splineCrossPoint = spline.getNearestPoint(new Point(spline.position.x, circleY));
+        lookAheadPoint = spline.getNearestPoint(new Point(spline.position.x, circleY - 5));
 
-        var nearestPoint = spline.getNearestPoint(measurePoint);
-        var yDistance = nearestPoint.x;
-        if (yDistance > imageShowThreshold && globals.nextTarget && !globals.showingImage) {
+        var angleVector = lookAheadPoint - splineCrossPoint;
+        var angle = angleVector.angle;
+        angle += 90;
+
+        arrowRotation = angle;
+
+        var nearestPoint = spline.getNearestLocation(measurePoint).curve;
+        var seg2Point = nearestPoint.next.segment1.point;
+        var seg1Point = nearestPoint.segment1.point;
+        var vector = measurePoint - seg2Point;
+        var yDistance = vector.y;
+
+        console.log(yDistance);
+
+        if (yDistance < imageShowThreshold && globals.nextTarget && !globals.showingImage) {
             globals.showingImage = true;
             showImage(globals.nextTarget);
         }
 
     }
+
+    setInterval(function() {
+        var distance = spline.getNearestLocation(measurePoint).distance
+        // console.log(distance);
+        if (socket.readyState === 1) {
+            socket.send(JSON.stringify({type: 'log', data: {dist: distance, timestamp: Date.now()}}));
+        }
+    }, 50);
 
   </script>
 
@@ -147,9 +169,25 @@
           fillColor: 'blue'
       }
   );
+
+  arrow.applyMartix = false;
+  arrow.transformContent = false;
+  var lastRot = null;
   function onFrame(event) {
       var measurePoint = new Point(arrowPos, 100);
+      lastRot = arrow.rotation;
 
+      arrow.rotate(arrowRotation - lastRot);
+      var rad = arrowRotation * Math.PI / 180;
+
+      var x = arrowPos + 100 * Math.sin(rad);
+      var y = -99 + 100 * Math.cos(rad);
+      var topPoint = new Point(arrowPos, 0);
+      var point = new Point(x, y);
+
+      var vector = point - topPoint;
+      measurePoint.x -= vector.x;
+      measurePoint.y += vector.y;
       arrow.position = measurePoint;
   }
 
@@ -194,40 +232,7 @@
         background-position: center;
         background-repeat: no-repeat;
       }
-      /*#line {
-          position: absolute;
-          width: 1rem;
-          height: 25%;
-          top: 35%;
-          background-color: black;
-          transition: left;
-          transition-duration: 0.5s;
-          transition-timing-function: linear;
 
-      }
-
-      #arrow {
-          position: absolute;
-          transition: left;
-          transition-duration: 0.1s;
-          transition-timing-function: linear;
-          margin-left: -2.0rem;
-      }
-
-      .line {
-          width: 1rem;
-          background-color: blue;
-          height: 20rem;
-          margin-left: 1.5rem;
-
-      }
-      .point {
-          width: 0;
-          height: 0;
-          border-left: 2rem solid transparent;
-          border-right: 2rem solid transparent;
-          border-bottom: 4rem solid blue;
-      }*/
   </style>
   </head>
   <body>
@@ -247,11 +252,13 @@
 
         let width = $('#arrowContainer').prop('offsetWidth');
         let lineContainerWidth = $('#direction').prop('offsetWidth');
+        let splineContainerHeight = $('#myCanvas').prop('offsetHeight');
 
         let halfway = width / 2;
 
         let arrowPos = halfway;
         let imageMap = null;
+        let imageShowTime = null;
 
         let nextTarget = null;
 
@@ -290,6 +297,8 @@
             }
             else if (data.target === null) {
                 clearImage();
+                let hideImageTime = Date.now();
+                socket.send(JSON.stringify({type: 'log', data: {eventType: 'showImage', timestart: imageShowTime, timeend: hideImageTime, elapsedTime: hideImageTime - imageShowTime}}));
                 Window.globals.nextTarget = null;
                 Window.globals.showingImage = false;
             }
@@ -318,6 +327,8 @@
             clearMessage();
             let imageUrl = imageMap[target];
             if (imageUrl) {
+                imageShowTime = Date.now();
+                socket.send(JSON.stringify({type: 'log', data: {eventType: 'showImage', timestart: imageShowTime}}))
                 $('#message').css('background-image', 'url(../'+ imageUrl + ')');
             }
             else {
