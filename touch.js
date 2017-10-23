@@ -23,7 +23,7 @@ class Touch {
         }
         this.shuffle();
         this.gen = this.nextTarget();
-        setTimeout(this.sendTargetUpdate.bind(this), 30000);
+        setTimeout(this.sendTargetUpdate.bind(this), 60000);
     }
 
     check(message) {

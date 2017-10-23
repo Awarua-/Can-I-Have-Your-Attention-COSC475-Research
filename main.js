@@ -126,8 +126,8 @@ let startChrome = () => {
     });
     touchChrome = chromeLauncher.launch({
         startingUrl: "http://localhost:3000/touchscreen/index.html",
-        chromeFlags: ['--incognito', '--disable-pinch', '--overscroll-history-navigation=0'],
-        enableAudio: true
+        ignoreDefaultFlags: true,
+        chromeFlags: [  '--disable-translate', '--disable-extensions', '--disable-background-networking', '--safebrowsing-disable-auto-update', '--disable-sync', '--metrics-recording-only', '--disable-default-apps', '--mute-audio', '--no-first-run', '--incognito', '--disable-pinch', '--overscroll-history-navigation=0']
     });
 };
 
