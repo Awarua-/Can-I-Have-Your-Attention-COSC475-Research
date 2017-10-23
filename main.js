@@ -127,7 +127,7 @@ let startChrome = () => {
     touchChrome = chromeLauncher.launch({
         startingUrl: "http://localhost:3000/touchscreen/index.html",
         ignoreDefaultFlags: true,
-        chromeFlags: [  '--disable-translate', '--disable-extensions', '--disable-background-networking', '--safebrowsing-disable-auto-update', '--disable-sync', '--metrics-recording-only', '--disable-default-apps', '--mute-audio', '--no-first-run', '--incognito', '--disable-pinch', '--overscroll-history-navigation=0']
+        chromeFlags: [  '--disable-translate', '--disable-extensions', '--disable-background-networking', '--safebrowsing-disable-auto-update', '--disable-sync', '--metrics-recording-only', '--disable-default-apps', '--no-first-run', '--incognito', '--disable-pinch', '--overscroll-history-navigation=0']
     });
 };
 
