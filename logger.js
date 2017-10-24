@@ -77,7 +77,7 @@ class Logger {
             this._closeFileStream().then(() => {
                 const path = directory + '/' + this.currentParticipantId + '.txt';
                 this.fileStream = fs.createWriteStream(path, {flags: "a+", encoding: 'utf-8',mode: 0o777});
-                this.fileStream.on('error', e => { console.log("fail"); console.error(e); });
+                this.fileStream.on('error', e => { console.error(e); });
                 resolve();
             }).catch(error => reject(error));
         });
@@ -109,6 +109,7 @@ class Logger {
         if (typeof data === 'object') {
             dataString = JSON.stringify(data);
         }
+
         this.fileStream.write(dataString + '\n');
     }
 

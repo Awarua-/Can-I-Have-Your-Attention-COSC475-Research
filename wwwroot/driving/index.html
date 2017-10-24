@@ -29,7 +29,7 @@
     var step = 600;
 
     var generate_spline = function(cb) {
-        var max = -150000;
+        var max = -100000;
         var starting = splineContainerHeight;
 
         var current = starting;
@@ -113,51 +113,36 @@
 
 
 
-    var destination = new Point(lineContainerWidth / 2, -100000)
+    var speed = 2
     var imageShowThreshold = 10;
     var measurePoint = null;
 
     function onFrame(event) {
         measurePoint = new Point(arrowPos, circleY);
 
-
-    	var vector = destination - spline.position;
-
         circle.position = measurePoint;
 
-    	spline.position -= vector / 25000;
+    	spline.position.y += speed;
 
-        splineCrossPoint = spline.getNearestPoint(new Point(spline.position.x, circleY));
-        lookAheadPoint = spline.getNearestPoint(new Point(spline.position.x, circleY - 5));
+        var point = spline.getNearestLocation(measurePoint);
+        var nearestPoint = point.curve;
+        if (nearestPoint.next !== null) {
+            var seg2Point = nearestPoint.next.segment1.point;
+            var seg1Point = nearestPoint.segment1.point;
+            var vector = measurePoint - seg2Point;
+            var yDistance = vector.y;
 
-        var angleVector = lookAheadPoint - splineCrossPoint;
-        var angle = angleVector.angle;
-        angle += 90;
+            if (yDistance < imageShowThreshold && globals.nextTarget && !globals.showingImage) {
+                globals.showingImage = true;
+                showImage(globals.nextTarget);
+            }
 
-        arrowRotation = angle;
-
-        var nearestPoint = spline.getNearestLocation(measurePoint).curve;
-        var seg2Point = nearestPoint.next.segment1.point;
-        var seg1Point = nearestPoint.segment1.point;
-        var vector = measurePoint - seg2Point;
-        var yDistance = vector.y;
-
-        console.log(yDistance);
-
-        if (yDistance < imageShowThreshold && globals.nextTarget && !globals.showingImage) {
-            globals.showingImage = true;
-            showImage(globals.nextTarget);
+            if (socket.readyState === 1) {
+                socket.send(JSON.stringify({type: 'log', data: {eventType: 'arrowDisplacement', dist: point.distance, timestamp: Date.now()}}));
+            }
         }
 
     }
-
-    setInterval(function() {
-        var distance = spline.getNearestLocation(measurePoint).distance
-        // console.log(distance);
-        if (socket.readyState === 1) {
-            socket.send(JSON.stringify({type: 'log', data: {dist: distance, timestamp: Date.now()}}));
-        }
-    }, 50);
 
   </script>
 
@@ -175,19 +160,6 @@
   var lastRot = null;
   function onFrame(event) {
       var measurePoint = new Point(arrowPos, 100);
-      lastRot = arrow.rotation;
-
-      arrow.rotate(arrowRotation - lastRot);
-      var rad = arrowRotation * Math.PI / 180;
-
-      var x = arrowPos + 100 * Math.sin(rad);
-      var y = -99 + 100 * Math.cos(rad);
-      var topPoint = new Point(arrowPos, 0);
-      var point = new Point(x, y);
-
-      var vector = point - topPoint;
-      measurePoint.x -= vector.x;
-      measurePoint.y += vector.y;
       arrow.position = measurePoint;
   }
 
@@ -228,9 +200,14 @@
           height: 100%;
           width: 100%;
           text-align: center;
+          vertical-align: middle;
           background-size: contain;
-        background-position: center;
-        background-repeat: no-repeat;
+          background-position: center;
+          background-repeat: no-repeat;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: 4em;
       }
 
   </style>

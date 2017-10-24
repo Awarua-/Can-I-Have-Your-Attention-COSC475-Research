@@ -22,11 +22,8 @@ let messageHandler = (message) => {
             logger.log(message);
             break;
         case 'log':
-            logger.log(message);
+            logger.log(message.data);
             touch.check(message.data);
-            break;
-        case 'sound':
-            logger.log(message);
             break;
         case 'hello':
             break;
@@ -37,6 +34,7 @@ let messageHandler = (message) => {
 
     clean = () => {
         return new Promise((resolve, reject) => {
+            logger.log({eventType: 'end', endTime: Date.now()})
             socket.destructor().then(() => server.close(() => logger.destructor)).catch(err => reject(err));
         });
     };
@@ -52,17 +50,23 @@ const express = require('express'),
     WSSocket = require('./websocket.js'),
     Steering = require('./steering.js'),
     Touch = require('./touch.js'),
-    stencilImageMap = require('./stencilImageMap.json'),
-    nonStencilImageMap = require('./nonStencilImageMap.json'),
+    set2 = require('./set2ImageMap.json'),
+    set1 = require('./set1ImageMap.json'),
+    trainingMap = require('./trainingImageMap.json'),
     chromeLauncher = require('chrome-launcher');
 
-let stencil = false,
-    imageMap = nonStencilImageMap;
+let imageMap = set1,
+    imageMapType = 'set1'
 
 for (arg of process.argv) {
-    if (arg === 'stencil') {
-        stencil = true;
-        imageMap = stencilImageMap;
+    if (arg == 'training') {
+        imageMapType = 'training';
+        imageMap = trainingMap;
+        break;
+    }
+    else if (arg === 'set2') {
+        imageMapType = 'set2'
+        imageMap = set2;
         break;
     }
 }
@@ -76,12 +80,7 @@ let touch = null,
 app.use(express.static('wwwroot'));
 
 app.get('/imageMap', (req, res) => {
-    if (stencil) {
-        res.json(stencilImageMap);
-    }
-    else {
-        res.json(nonStencilImageMap);
-    }
+    res.send(imageMap);
 });
 
 app.get('/participantId', (req, res) => {
@@ -133,7 +132,12 @@ let startChrome = () => {
 
 let server = app.listen(3000, () => {
     console.log('Starting server on port 3000');
+    setTimeout(() => {
+        let id = logger.getCurrentParticipantId();
+        logger.log({eventType: 'start', id: id, startTime: Date.now(), imageMap: imageMapType});
+    }, 300);
+
     socket = new WSSocket(messageHandler.bind(this), startChrome.bind(this));
     steering = new Steering(socket.send.bind(socket), logger.log.bind(logger), true, false);
-    touch = new Touch(socket.send.bind(socket), imageMap);
+    touch = new Touch(socket.send.bind(socket), imageMap, imageMapType);
 });

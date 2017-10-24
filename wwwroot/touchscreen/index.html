@@ -29,6 +29,7 @@
       }
 
       .round {
+          display: none;
           background-size: 2.4rem 2.4rem;
           background-position: center;
           background-repeat: no-repeat;
@@ -140,67 +141,67 @@
       </button>
       <button class="round medium_flat column1 row2" id="m_f_2_1">
       </button>
-      <!-- <button class="round small_curve column1 row3" id="s_c_3_1">
-      </button> -->
-      <!-- <button class="round large_flat column1 row4" id="l_f_4_1">
+      <button class="round small_curve column1 row3" id="s_c_3_1">
+      </button>
+      <button class="round large_flat column1 row4" id="l_f_4_1">
       </button>
       <button class="round medium_curve column1 row5" id="m_c_5_1">
-      </button> -->
+      </button>
 
       <button class="round small_curve column2 row1" id="s_c_1_2">
       </button>
       <button class="round large_flat column2 row2" id="l_f_2_2">
       </button>
-      <!-- <button class="round medium_curve column2 row3" id="m_c_3_2">
-      </button> -->
-      <!-- <button class="round medium_flat column2 row4" id="m_f_4_2">
+      <button class="round medium_curve column2 row3" id="m_c_3_2">
+      </button>
+      <button class="round medium_flat column2 row4" id="m_f_4_2">
       </button>
       <button class="round small_curve column2 row5" id="s_c_5_2">
-      </button> -->
+      </button>
 
         <button class="round medium_curve column3 row1" id="m_c_1_3">
         </button>
         <button class="round small_flat column3 row2" id="s_f_2_3">
         </button>
-        <!-- <button class="round large_curve column3 row3" id="l_c_3_3">
-        </button> -->
-        <!-- <button class="round small_flat column3 row4" id="s_f_4_3">
+        <button class="round large_curve column3 row3" id="l_c_3_3">
+        </button>
+        <button class="round small_flat column3 row4" id="s_f_4_3">
         </button>
         <button class="round large_curve column3 row5" id="l_c_5_3">
-        </button> -->
+        </button>
 
         <button class="round small_flat column4 row1" id="s_f_1_4">
         </button>
         <button class="round large_curve column4 row2" id="l_c_2_4">
         </button>
-        <!-- <button class="round medium_flat column4 row3" id="m_f_3_4">
-        </button> -->
-        <!-- <button class="round small_curve column4 row4" id="s_c_4_4">
+        <button class="round medium_flat column4 row3" id="m_f_3_4">
+        </button>
+        <button class="round small_curve column4 row4" id="s_c_4_4">
         </button>
         <button class="round medium_flat column4 row5" id="m_f_5_4">
-        </button> -->
+        </button>
 
         <button class="round large_flat column5 row1" id="l_f_1_5">
         </button>
         <button class="round medium_curve column5 row2" id="m_c_2_5">
         </button>
-        <!-- <button class="round large_flat column5 row3" id="l_f_3_5">
-        </button> -->
-        <!-- <button class="round medium_curve column5 row4" id="m_c_4_5">
+        <button class="round large_flat column5 row3" id="l_f_3_5">
+        </button>
+        <button class="round medium_curve column5 row4" id="m_c_4_5">
         </button>
         <button class="round large_flat column5 row5" id="l_f_5_5">
-        </button> -->
+        </button>
 
         <button class="round medium_flat column6 row1" id="m_f_1_6">
         </button>
         <button class="round small_curve column6 row2" id="s_c_2_6">
         </button>
-        <!-- <button class="round small_flat column6 row3" id="s_f_3_6">
-        </button> -->
-        <!-- <button class="round large_curve column6 row4" id="l_c_4_6">
+        <button class="round small_flat column6 row3" id="s_f_3_6">
+        </button>
+        <button class="round large_curve column6 row4" id="l_c_4_6">
         </button>
         <button class="round small_flat column6 row5" id="s_f_5_6">
-        </button> -->
+        </button>
  </div>
  <div id="empty">
 
@@ -227,7 +228,8 @@
             console.log('error');
         });
 
-        console.log('hello');
+        let timeSinceLastClick = Date.now(),
+            doubleClickTimeThreshold = 1000;
 
 
         socket.addEventListener('open', function (event) {
@@ -256,13 +258,18 @@
                 for (let key in data) {
                     let ref = "../" + data[key];
                     $("#" + key).css('background-image', 'url('+ ref + ')');
+                    $('#' + key).css('display', 'inline-block');
                 }
             });
 
             $('body').bind('touchstart', (event) => {
                 event.preventDefault();
-                socket.send(JSON.stringify({type: 'sound', data: {soundType: "click"}}));
-                clickSound.play();
+                let now = Date.now();
+                if (now - timeSinceLastClick > doubleClickTimeThreshold) {
+                    clickSound.play();
+                    timeSinceLastClick = now;
+                }
+                socket.send(JSON.stringify({type: 'log', data: {eventType: 'touchstart', timestamp: Date.now()}}));
             });
 
             $('button').bind('touchend', (event) => {
@@ -270,14 +277,12 @@
 
                 if (event.target.id === lastTarget) {
                     lastTarget = null;
-                    socket.send(JSON.stringify({type: 'sound', data: {soundType: "hit"}}));
-                    socket.send(JSON.stringify({type: 'log', data: {hit: true, target: event.target.id, timestamp: Date.now()}}));
+                    socket.send(JSON.stringify({type: 'log', data: {eventType: 'buttonHit', hit: true, target: event.target.id, timestamp: Date.now()}}));
                     hitSound.play();
                 }
 
                 else {
-                    socket.send(JSON.stringify({type: 'sound', data: {soundType: "miss"}}));
-                    socket.send(JSON.stringify({type: 'log', data: {hit: false, timestamp: Date.now()}}));
+                    socket.send(JSON.stringify({type: 'log', data: {eventType: 'buttonHit', hit: false, timestamp: Date.now()}}));
                     missSound.play();
                 }
             });
@@ -288,14 +293,11 @@
                 let isButton = $(endTarget).is(":button");
 
                 if(isButton && lastTarget === endTarget.id) {
-                    socket.send(JSON.stringify({type: 'sound', data: {soundType: "hit"}}));
-                    socket.send(JSON.stringify({type: 'log', data: {hit: true, target: endTarget.id, timestamp: Date.now()}}));
+                    socket.send(JSON.stringify({type: 'log', data: {eventType: 'buttonHit', hit: true, target: endTarget.id, timestamp: Date.now()}}));
                     hitSound.play();
                 }
                 else {
-                    socket.send(JSON.stringify({type: 'sound', data: {soundType: "miss"}}));
-                    socket.send(JSON.stringify({type: 'log', data: {hit: false, timestamp: Date.now()}}));
-                    missSound.play();
+                    socket.send(JSON.stringify({type: 'log', data: {eventType: 'liftOff', hit: false, timestamp: Date.now()}}));
                 }
             });
         })

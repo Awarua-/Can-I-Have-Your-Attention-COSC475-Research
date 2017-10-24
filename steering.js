@@ -40,7 +40,7 @@ class Steering {
             if (data[0] === 'Space') {
                 this.hold = false;
                 let time = Date.now();
-                this.log({type: 'focus', data: {startTime: this.startSpaceTime, endTime: time, elapsedTime: time - this.startSpaceTime}});
+                this.log({eventType: 'focus', startTime: this.startSpaceTime, endTime: time, elapsedTime: time - this.startSpaceTime});
             }
         });
     }

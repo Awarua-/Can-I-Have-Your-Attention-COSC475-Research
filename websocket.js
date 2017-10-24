@@ -37,9 +37,10 @@ class WSSocket {
     send(data, ws) {
         this.wss.clients.forEach((client) => {
             if (client !== ws && client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify(data));
+                let json = JSON.stringify(data);
+                client.send(json);
             }
-        })
+        });
     }
 }
 

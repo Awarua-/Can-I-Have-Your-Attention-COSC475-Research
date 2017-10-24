@@ -25,6 +25,7 @@ class Wheel {
         this.heading += (val - 50) / 500;
         let pos = this.heading.toFixed(1);
         pos /= 100;
+        pos = Math.max(0, Math.min(1, pos));
         if (!this.lastValue) {
             this.lastValue = pos;
         }
@@ -33,7 +34,7 @@ class Wheel {
             this.lastValue = pos;
         }
 
-        this.callback({type: "steering", data: Math.max(0, Math.min(1, pos))});
+        this.callback({type: "steering", data: pos});
     }
 
     destructor() {
