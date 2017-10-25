@@ -44,7 +44,7 @@ class Touch {
             }
             else {
                 if (Object.keys(this.imageMap).length % this.sequenceNumber === 0 && this.imageMapType !== 'training') {
-                    setTimeout(this.sendTargetUpdate.bind(this), 10000, next.value);
+                    setTimeout(this.sendTargetUpdate.bind(this), 15000, next.value);
                 }
                 else {
                     setTimeout(this.sendTargetUpdate.bind(this), 1000, next.value);

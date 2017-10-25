@@ -12,11 +12,13 @@ yarn
 
 yarn install  
 cd node_modules/chrome-launcher  
-yarn build
+yarn install  
+yarn build  
+cd ../..
 
 
 ## Running
 
 node main.js training  
 node main.js set1  
-node main.js set2  
+node main.js set2
