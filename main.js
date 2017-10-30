@@ -71,6 +71,8 @@ for (arg of process.argv) {
     }
 }
 
+let stencilCondition = process.argv[3];
+
 let touch = null,
     steering = null,
     socket = null,
@@ -114,19 +116,19 @@ app.use((req, res, next) => {
 })
 
 app.use((err, req, res, next) => {
-    console.error(err.stack);
+    console.error(err.stack);                                        
     res.sendStatus(500);
 })
 
 let startChrome = () => {
     drivingChrome = chromeLauncher.launch({
         startingUrl: "http://localhost:3000/driving/index.html",
-        chromeFlags: ['--incognito', '--disable-pinch', '--overscroll-history-navigation=0']
+        chromeFlags: ['--start-fullscreen', '--window-position=-1920,0', '--window-size=1920,1080', '--enable-features="CheckerImaging"', '--incognito', '--disable-pinch', '--overscroll-history-navigation=0']
     });
     touchChrome = chromeLauncher.launch({
         startingUrl: "http://localhost:3000/touchscreen/index.html",
         ignoreDefaultFlags: true,
-        chromeFlags: [  '--disable-translate', '--disable-extensions', '--disable-background-networking', '--safebrowsing-disable-auto-update', '--disable-sync', '--metrics-recording-only', '--disable-default-apps', '--no-first-run', '--incognito', '--disable-pinch', '--overscroll-history-navigation=0']
+        chromeFlags: ['--disable-gpu', '--start-fullscreen', '--window-position=-3840,0', '--window-size=1920,1080', '--enable-features="CheckerImaging"', '--disable-translate', '--disable-extensions', '--disable-background-networking', '--safebrowsing-disable-auto-update', '--disable-sync', '--metrics-recording-only', '--disable-default-apps', '--no-first-run', '--incognito', '--disable-pinch', '--overscroll-history-navigation=0']
     });
 };
 
@@ -134,8 +136,8 @@ let server = app.listen(3000, () => {
     console.log('Starting server on port 3000');
     setTimeout(() => {
         let id = logger.getCurrentParticipantId();
-        logger.log({eventType: 'start', id: id, startTime: Date.now(), imageMap: imageMapType});
-    }, 300);
+        logger.log({eventType: 'start', id: id, startTime: Date.now(), imageMap: imageMapType, condition: stencilCondition, programArgs: process.argv});
+    }, 500);
 
     socket = new WSSocket(messageHandler.bind(this), startChrome.bind(this));
     steering = new Steering(socket.send.bind(socket), logger.log.bind(logger), true, false);

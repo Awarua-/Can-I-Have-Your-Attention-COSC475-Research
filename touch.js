@@ -43,11 +43,11 @@ class Touch {
                 this.sendMessage('Finished');
             }
             else {
-                if (Object.keys(this.imageMap).length % this.sequenceNumber === 0 && this.imageMapType !== 'training') {
+                if (this.sequenceNumber % Object.keys(this.imageMap).length === 0 && this.imageMapType !== 'training') {
                     setTimeout(this.sendTargetUpdate.bind(this), 15000, next.value);
                 }
                 else {
-                    setTimeout(this.sendTargetUpdate.bind(this), 1000, next.value);
+                    setTimeout(this.sendTargetUpdate.bind(this), 1500, next.value);
                 }
             }
             // wait for random timeout

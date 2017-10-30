@@ -6,12 +6,9 @@
 
     <title>Driving Task</title>
     <meta name="description" content="Driving Task display">
-    <script
-  src="https://code.jquery.com/jquery-3.2.1.min.js"
-  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-  crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.11.5/paper-full.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/2.4.3/seedrandom.min.js"></script>
+    <script src="../scripts/jquery-3.2.1.min.js"></script>
+  <script src="../scripts/paper-full.min.js"></script>
+  <script src="../scripts/seedrandom.min.js"></script>
   <script>
       Window.globals = {
           nextTarget: null,
@@ -114,8 +111,9 @@
 
 
     var speed = 2
-    var imageShowThreshold = 10;
+    var imageShowThreshold = 20;
     var measurePoint = null;
+	var point = null;
 
     function onFrame(event) {
         measurePoint = new Point(arrowPos, circleY);
@@ -124,25 +122,27 @@
 
     	spline.position.y += speed;
 
-        var point = spline.getNearestLocation(measurePoint);
+        point = spline.getNearestLocation(measurePoint);
         var nearestPoint = point.curve;
         if (nearestPoint.next !== null) {
             var seg2Point = nearestPoint.next.segment1.point;
             var seg1Point = nearestPoint.segment1.point;
             var vector = measurePoint - seg2Point;
             var yDistance = vector.y;
-
+			
             if (yDistance < imageShowThreshold && globals.nextTarget && !globals.showingImage) {
                 globals.showingImage = true;
                 showImage(globals.nextTarget);
             }
-
-            if (socket.readyState === 1) {
-                socket.send(JSON.stringify({type: 'log', data: {eventType: 'arrowDisplacement', dist: point.distance, timestamp: Date.now()}}));
-            }
         }
 
     }
+	
+	setInterval(function() {
+		if (socket.readyState === 1) {
+			socket.send(JSON.stringify({type: 'log', data: {eventType: 'arrowDisplacement', dist: point.distance, timestamp: Date.now()}}));
+		}
+	}, 50);
 
   </script>
 
