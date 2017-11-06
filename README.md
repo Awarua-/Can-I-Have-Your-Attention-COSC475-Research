@@ -5,11 +5,11 @@
 
 ## Requirements
 
-[Node v8, or higher](https://nodejs.org/en/download/current/)
-[Java 8 (latest)](https://java.com/en/download/)
-[Chrome installed](https://www.google.com/chrome/browser/desktop/index.html)
-[yarn](https://yarnpkg.com/en/docs/install)
-[Logitech G29 drivers](http://support.logitech.com/en_us/product/g29-driving-force/downloads)
+[Node v8, or higher](https://nodejs.org/en/download/current/)  
+[Java 8 (latest)](https://java.com/en/download/)  
+[Chrome installed](https://www.google.com/chrome/browser/desktop/index.html)  
+[yarn](https://yarnpkg.com/en/docs/install)  
+[Logitech G29 drivers](http://support.logitech.com/en_us/product/g29-driving-force/downloads)  
 
 ##### Ensure that the following are available in your PATH/ENVIRONMENT, node, java, yarn
 
@@ -24,8 +24,8 @@
 
 
 ## Running
-To run the experiment, open a terminal or command window, navigate to the project folder.
-In the case of the HITLab machine this is **C:\Users\Research\Can-I-Have-Your-Attention-COSC475-Research**
+To run the experiment, open a terminal or command window, navigate to the project folder.  
+In the case of the HITLab machine this is **C:\Users\Research\Can-I-Have-Your-Attention-COSC475-Research**  
 Enter the command line args as specified below.
 
 The application should launch two chrome windows in fullscreen on the correct displays.
@@ -36,13 +36,12 @@ Perform the experiment
 To quit the experiment, press Control-C when you have focus on the command prompt. 
 This will kill both chrome windows and write out any remaining data to the log file.
 
-Log files can be found in the results folder.
+Log files can be found in the results folder.  
 Note that every time the application is run it creates a new log file. This means that a participant will have multiple log files.
-However, at th
 
 ### Command line args
-The experiment accepts two command line arguments, the icon set and the condition (w or w/o stencil)
-The icon set can be one of three values, [training, set1, set2]
+The experiment accepts two command line arguments, the icon set and the condition (w or w/o stencil)  
+The icon set can be one of three values, [training, set1, set2]  
 For the second argument the program accepts any string.
 
 A few examples are below:
@@ -51,11 +50,11 @@ A few examples are below:
 * node main.js set2 stencil
 
 ## Targets
-Targets are specified using properties separated by underscores
-[s,m,l]\_[f,c]\_[1,2]_[1,2,3,4,5,6]
-The first specifies the size, s=>small, m=>medium, l=>large
-Second is the entry profile, f=flat, c=curved or 45 degrees
-Third is the row, in this case 1 or 2, (note the stencil can accommodate a total of six rows)
+Targets are specified using properties separated by underscores  
+[s,m,l]\_[f,c]\_[1,2]_[1,2,3,4,5,6]  
+The first specifies the size, s=>small, m=>medium, l=>large  
+Second is the entry profile, f=flat, c=curved or 45 degrees  
+Third is the row, in this case 1 or 2, (note the stencil can accommodate a total of six rows)  
 Fourth is the column, 1 - 6, or specifically 1 - 3 is the left side and 4 - 6 is the right
 ## Logging events
 Event types
