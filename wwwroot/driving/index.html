@@ -275,7 +275,7 @@
             else if (data.target === null) {
                 clearImage();
                 let hideImageTime = Date.now();
-                socket.send(JSON.stringify({type: 'log', data: {eventType: 'showImage', timestart: imageShowTime, timeend: hideImageTime, elapsedTime: hideImageTime - imageShowTime}}));
+                socket.send(JSON.stringify({type: 'log', data: {eventType: 'hideImage', timestart: imageShowTime, timeend: hideImageTime, elapsedTime: hideImageTime - imageShowTime}}));
                 Window.globals.nextTarget = null;
                 Window.globals.showingImage = false;
             }
