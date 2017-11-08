@@ -46,7 +46,6 @@ const express = require('express'),
     bodyParser = require('body-parser'),
     jsonParser = bodyParser.json(),
     Logger = require('./logger.js'),
-    logger = new Logger(),
     WSSocket = require('./websocket.js'),
     Steering = require('./steering.js'),
     Touch = require('./touch.js'),
@@ -58,26 +57,45 @@ const express = require('express'),
 let imageMap = set1,
     imageMapType = 'set1'
 
-for (arg of process.argv) {
-    if (arg == 'training') {
-        imageMapType = 'training';
-        imageMap = trainingMap;
-        break;
-    }
-    else if (arg === 'set2') {
-        imageMapType = 'set2'
-        imageMap = set2;
-        break;
-    }
+let iconSet = process.argv[2];
+if (iconSet === 'training') {
+    imageMapType = 'training';
+    imageMap = trainingMap;
+}
+else if (iconSet === 'set1') {
+    imageMapType = 'set1'
+    imageMap = set1;
+}
+else if (iconSet === 'set2') {
+    imageMapType = 'set2'
+    imageMap = set2;
+}
+else {
+    console.error("icon set not found");
+    process.exit(1);
 }
 
+
 let stencilCondition = process.argv[3];
+
+if (!stencilCondition) {
+    console.error("stencil condition was not specified");
+    process.exit(1);
+}
+
+let participantId = process.argv[4];
+
+if (!participantId) {
+    console.error("participant Id was not specified");
+    process.exit(1);
+}
 
 let touch = null,
     steering = null,
     socket = null,
     drivingChrome = null,
-    touchChrome = null;
+    touchChrome = null,
+    logger = new Logger(participantId);
 
 app.use(express.static('wwwroot'));
 
@@ -86,11 +104,7 @@ app.get('/imageMap', (req, res) => {
 });
 
 app.get('/participantId', (req, res) => {
-    res.json(logger.getCurrentParticipantId());
-})
-
-app.post('/participantId', (req, res) => {
-    res.json(logger.newParticipant());
+    res.json(participantId);
 })
 
 app.post('/presurvey', jsonParser, (req, res) => {
@@ -135,7 +149,7 @@ let startChrome = () => {
 let server = app.listen(3000, () => {
     console.log('Starting server on port 3000');
     setTimeout(() => {
-        let id = logger.getCurrentParticipantId();
+        let id = participantId;
         logger.log({eventType: 'start', id: id, startTime: Date.now(), imageMap: imageMapType, condition: stencilCondition, programArgs: process.argv});
     }, 500);
 

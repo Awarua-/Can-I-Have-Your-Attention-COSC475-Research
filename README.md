@@ -40,14 +40,15 @@ Log files can be found in the results folder.
 Note that every time the application is run it creates a new log file. This means that a participant will have multiple log files.
 
 ### Command line args
-The experiment accepts two command line arguments, the icon set and the condition (w or w/o stencil)  
+The experiment accepts two command line arguments, the icon set the condition (w or w/o stencil) and the participants Id  
 The icon set can be one of three values, [training, set1, set2]  
-For the second argument the program accepts any string.
+For the second argument the program accepts any string.  
+The final argument is the participantID, this can be any alphanumeric string.
 
 A few examples are below:
-* node main.js training stencil
-* node main.js set1 noStencil
-* node main.js set2 stencil
+* node main.js training stencil 1
+* node main.js set1 noStencil 1
+* node main.js set2 stencil 1
 
 ## Targets
 Targets are specified using properties separated by underscores  

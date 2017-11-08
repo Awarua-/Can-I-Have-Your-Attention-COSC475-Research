@@ -5,10 +5,9 @@ const fs = require('fs'),
 
 
 class Logger {
-    constructor() {
-        this.currentParticipantId = 1;
+    constructor(participantId) {
+        this.participantId = participantId;
         this._checkForDirectory()
-        .then(() => this._findNextId())
         .then(() => this._createFileHandle())
         .catch(error => {
             console.log(error);
@@ -38,25 +37,6 @@ class Logger {
         });
     }
 
-    _findNextId(){
-        return new Promise((resolve, reject) => {
-            fs.readdir(directory, (err, files) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-                if (files.length > 0) {
-                    files = files.map(i => {return parseInt(i.replace(".txt", ""))});
-                    files.sort((a, b) => {return a - b});
-                    this.currentParticipantId = files[files.length - 1]  + 1;
-                    resolve();
-                } else {
-                    resolve();
-                }
-            })
-        });
-    }
-
     _closeFileStream() {
         return new Promise((resolve, reject) => {
             try {
@@ -75,7 +55,7 @@ class Logger {
     _createFileHandle() {
         return new Promise((resolve, reject) => {
             this._closeFileStream().then(() => {
-                const path = directory + '/' + this.currentParticipantId + '.txt';
+                const path = directory + '/' + this.participantId + '.txt';
                 this.fileStream = fs.createWriteStream(path, {flags: "a+", encoding: 'utf-8',mode: 0o777});
                 this.fileStream.on('error', e => { console.error(e); });
                 resolve();
@@ -87,21 +67,9 @@ class Logger {
         return this.currentParticipantId;
     }
 
-    newParticipant() {
-        this.currentParticipantId += 1;
-        this._createFileHandle()
-        .then(() => {
-            return true})
-        .catch(error => {
-            console.log(error);
-            return false;
-        });
-        return this.currentParticipantId;
-    }
-
     log(data) {
         //FIXME race condition, when opening new file to write too.
-        if (data.participantId && data.participantId !== this.currentParticipantId) {
+        if (data.participantId && data.participantId !== this.participantId) {
             console.error("participant Id does not match the file being logged to");
             //FIXME raise exception?
         }
