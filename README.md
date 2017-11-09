@@ -68,7 +68,9 @@ Event types
 * arrowDisplacement
     * dist: distance from the spline to the tip of the arrow, threshold this value to tell if drifted from path
     * timestamp: UNIX timestamp
-* focus (Holding the spacebar down)
+* focusstart (When the spacebar is first held down)
+    * startTime: UNIX timestamp
+* focusend (on spacebar release)
     * startTime: UNIX timestamp
     * endTime: UNIX timestamp
     * elapsedTime: in milliseconds
