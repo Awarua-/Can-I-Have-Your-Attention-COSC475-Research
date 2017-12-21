@@ -20,7 +20,7 @@
     "gkm": "^0.1.0",
     "key-emit": "0.0.4",
     "logitech-g29": "Awarua-/logitech-g29#dependancy_updates",
-    "mathjs": "^3.14.2",
+    "mathjs": "^3.17.0",
     "readable-stream": "^2.3.3",
     "seedrandom": "^2.4.3",
     "ws": "^2.3.1"
